@@ -3,6 +3,7 @@ package handlers
 import (
 	"25fd/micro-service/data"
 	"context"
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -91,6 +92,17 @@ func (p *Product) MiddlewareProductValidation(next http.Handler) http.Handler {
 
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		err = prod.Validate()
+		if err != nil {
+			p.l.Println("[ERROR] validating product", err)
+			http.Error(
+				w,
+				fmt.Sprintf("Error validating product: %s", err),
+				http.StatusBadRequest,
+			)
 			return
 		}
 
